@@ -1,5 +1,6 @@
 ﻿namespace StaticMocks
 {
+    using NSubstitute;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -19,6 +20,24 @@
             mockDelegates = new Dictionary<MethodInfo, MockDelegate>();
         }
 
+        public object For(Expression<Action> target)
+        {
+            var methodCallExpression = (MethodCallExpression)target.Body;
+            var method = methodCallExpression.Method;
+
+            MockDelegate mockDelegate;
+            if (!mockDelegates.TryGetValue(method, out mockDelegate))
+            {
+                // mockDelegate = new NSubstituteMockDelegate(targetType, method);
+                mockDelegate = new MockDelegate(targetType, method, true);
+                mockDelegates[method] = mockDelegate;
+            }
+
+            mockDelegate.InvokeDelegate(methodCallExpression);
+
+            return null;
+        }
+
         public MockTarget Setup(Expression<Action> target)
         {
             var methodCallExpression = (MethodCallExpression)target.Body;
@@ -27,7 +46,8 @@
             MockDelegate mockDelegate;
             if(!mockDelegates.TryGetValue(method, out mockDelegate))
             {
-                mockDelegate = new MockDelegate(targetType, method);
+                //mockDelegate = new BasicMockDelegate(targetType, method);
+                mockDelegate = new MockDelegate(targetType, method, false);
                 mockDelegates[method] = mockDelegate;
             }
 
@@ -44,6 +64,22 @@
             mockDelegates = null;
         }
 
+        public class NSubstituteMockDelegate : MockDelegate
+        {
+            internal NSubstituteMockDelegate(Type targetType, MethodInfo method)
+                : base(targetType, method, true)
+            {
+            }
+        }
+
+        public class BasicMockDelegate : MockDelegate
+        {
+            internal BasicMockDelegate(Type targetType, MethodInfo method)
+                : base(targetType, method, false)
+            {
+            }
+        }
+
         public class MockDelegate : IDisposable
         {
             MethodInfo method;
@@ -51,14 +87,39 @@
             object savedValue;
             IDictionary<object, object> methodReturns = new Dictionary<object, object>();
 
-            internal MockDelegate(Type targetType, MethodInfo method)
+            public Delegate Delegate
+            {
+                get; private set;
+            }
+
+            internal MockDelegate(Type targetType, MethodInfo method, bool nsub)
             {
                 this.method = method;
                 mockField = getMockField(targetType, method);
 
                 savedValue = mockField.GetValue(null);
-                var func = createDelegateFor(mockField.FieldType);
-                mockField.SetValue(null, func);
+                if(nsub)
+                {
+                    Delegate = createNSubstituteDelegateFor(mockField.FieldType);
+                }
+                else
+                {
+                    Delegate = createDelegateFor(mockField.FieldType);
+                }
+
+                mockField.SetValue(null, Delegate);
+            }
+
+            internal void InvokeDelegate(MethodCallExpression methodCallExpression)
+            {
+                var argList = new List<object>();
+                foreach (var arg in methodCallExpression.Arguments)
+                {
+                    var value = getValue(arg);
+                    argList.Add(value);
+                }
+
+                Delegate.DynamicInvoke(argList.ToArray());
             }
 
             static FieldInfo getMockField(Type targetType, MethodInfo method)
@@ -90,6 +151,11 @@
             public void Dispose()
             {
                 mockField.SetValue(null, savedValue);
+            }
+
+            Delegate createNSubstituteDelegateFor(Type delegateType)
+            {
+                return (Delegate)Substitute.For(new Type[] { delegateType }, new object[0]);
             }
 
             Delegate createDelegateFor(Type delegateType)
