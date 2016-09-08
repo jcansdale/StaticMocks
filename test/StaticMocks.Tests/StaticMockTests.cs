@@ -63,7 +63,7 @@
             {
                 staticMock.Setup(() => System.IO.Directory.CreateDirectory("___"));
             }
-            catch (StaticMocksException e)
+            catch (StaticMockException e)
             {
                 var classDefinition =
 @"partial class Directory
@@ -84,7 +84,7 @@
             {
                 staticMock.Setup(() => System.Console.WriteLine("Hello, World!"));
             }
-            catch (StaticMocksException e)
+            catch (StaticMockException e)
             {
                 var classDefinition =
 @"internal static Action<string> WriteLine = (string value) => System.Console.WriteLine(value);";

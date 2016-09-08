@@ -49,7 +49,7 @@
     <Compile Include="StaticMocks\NSubstituteSupport.cs" />
     <Compile Include="StaticMocks\Properties\AssemblyInfo.cs" />
     <Compile Include="StaticMocks\StaticMock.cs" />
-    <Compile Include="StaticMocks\StaticMocksException.cs" />
+    <Compile Include="StaticMocks\StaticMockException.cs" />
     <Compile Include="StaticMocks\StaticMockUtilities.cs" />
   </ItemGroup>
   <ItemGroup>

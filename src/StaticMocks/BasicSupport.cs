@@ -14,26 +14,26 @@
 
             var mockDelegate = staticMock.GetMockDelegate(method);
 
-            BasicMockDelegate basicMockDelegate;
+            MockDelegateTarget mockDelegateTarget;
             if (!mockDelegate.IsMocked)
             {
-                basicMockDelegate = new BasicMockDelegate(method);
-                mockDelegate.Delegate = basicMockDelegate.CreateDelegateFor(mockDelegate.DelegateType);
+                mockDelegateTarget = new MockDelegateTarget(method);
+                mockDelegate.Delegate = mockDelegateTarget.CreateDelegateFor(mockDelegate.DelegateType);
             }
             else
             {
-                basicMockDelegate = (BasicMockDelegate)mockDelegate.Delegate.Target;
+                mockDelegateTarget = (MockDelegateTarget)mockDelegate.Delegate.Target;
             }
 
-            return new MockTarget(basicMockDelegate, methodCallExpression);
+            return new MockTarget(mockDelegateTarget, methodCallExpression);
         }
 
-        public class BasicMockDelegate
+        internal class MockDelegateTarget
         {
             MethodInfo method;
             IDictionary<object, object> methodReturns = new Dictionary<object, object>();
 
-            internal BasicMockDelegate(MethodInfo method)
+            internal MockDelegateTarget(MethodInfo method)
             {
                 this.method = method;
             }
@@ -147,7 +147,7 @@
                 var argList = new List<object>();
                 foreach (var arg in methodCallExpression.Arguments)
                 {
-                    var value = StaticMockUtilities.GetValue(arg);
+                    var value = StaticMock.Utilities.GetValue(arg);
                     argList.Add(value);
                 }
 
@@ -176,31 +176,31 @@
 
         public class MockTarget
         {
-            BasicMockDelegate mockDelegate;
+            MockDelegateTarget mockDelegateTarget;
             MethodCallExpression methodCallExpression;
 
-            internal MockTarget(BasicMockDelegate mockDelegate, MethodCallExpression methodCallExpression)
+            internal MockTarget(MockDelegateTarget mockDelegateTarget, MethodCallExpression methodCallExpression)
             {
-                this.mockDelegate = mockDelegate;
+                this.mockDelegateTarget = mockDelegateTarget;
                 this.methodCallExpression = methodCallExpression;
             }
 
             public MockTarget Returns(object ret)
             {
-                mockDelegate.SetReturns(methodCallExpression, ret);
+                mockDelegateTarget.SetReturns(methodCallExpression, ret);
                 return this;
             }
 
             public MockTarget Returns(object ret, object defaultRet)
             {
-                mockDelegate.SetReturns(methodCallExpression, ret);
-                mockDelegate.SetDefault(methodCallExpression, defaultRet);
+                mockDelegateTarget.SetReturns(methodCallExpression, ret);
+                mockDelegateTarget.SetDefault(methodCallExpression, defaultRet);
                 return this;
             }
 
             public MockTarget Default(object defaultRet)
             {
-                mockDelegate.SetDefault(methodCallExpression, defaultRet);
+                mockDelegateTarget.SetDefault(methodCallExpression, defaultRet);
                 return this;
             }
         }

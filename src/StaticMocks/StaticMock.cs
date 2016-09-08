@@ -2,10 +2,9 @@
 {
     using System;
     using System.Reflection;
-    using System.Linq.Expressions;
     using System.Collections.Generic;
 
-    public class StaticMock : IDisposable
+    public partial class StaticMock : IDisposable
     {
         Type targetType;
         IDictionary<MethodInfo, MockDelegate> mockDelegates;
@@ -26,7 +25,7 @@
             mockDelegates = null;
         }
 
-        internal MockDelegate GetMockDelegate(MethodInfo method)
+        public MockDelegate GetMockDelegate(MethodInfo method)
         {
             MockDelegate mockDelegate;
             if (!mockDelegates.TryGetValue(method, out mockDelegate))

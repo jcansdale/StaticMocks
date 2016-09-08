@@ -55,7 +55,7 @@
             var mockType = targetType.GetTypeInfo().GetNestedType(mockTypeName, BindingFlags.Public | BindingFlags.NonPublic);
             if (mockType == null)
             {
-                throw new StaticMocksException(targetType, method);
+                throw new StaticMockException(targetType, method);
             }
 
             var mockFieldName = method.Name + method.GetParameters().Length;
@@ -72,7 +72,7 @@
                 return field;
             }
 
-            throw new StaticMocksException(targetType, method);
+            throw new StaticMockException(targetType, method);
         }
     }
 }

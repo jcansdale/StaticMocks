@@ -4,7 +4,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
-    using System.Reflection;
 
     public static class NSubstituteSupport
     {
@@ -22,7 +21,7 @@
             var argList = new List<object>();
             foreach (var arg in methodCallExpression.Arguments)
             {
-                var value = StaticMockUtilities.GetValue(arg);
+                var value = StaticMock.Utilities.GetValue(arg);
                 argList.Add(value);
             }
 
