@@ -6,7 +6,9 @@
   "runtimes": { "win": {} },
 
   "dependencies": {
-    "StaticMocks": "1.0.0-*",
+    "StaticMocks": {
+      "target": "project"
+    },
     "dotnet-test-nunit": "3.4.0-beta-2",
     "NUnit": "3.4.1"
   },
@@ -23,6 +25,6 @@
       },
       "imports": "dnxcore50"
     },
-    "net452": {}
+    "net452": { }
   }
 }
