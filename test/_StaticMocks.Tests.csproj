@@ -55,6 +55,7 @@
     <Compile Include="StaticMocks.Tests\NSubstituteTests.cs" />
     <Compile Include="StaticMocks.Tests\Properties\AssemblyInfo.cs" />
     <Compile Include="StaticMocks.Tests\StaticMockTests.cs" />
+    <Compile Include="StaticMocks.Tests\ExpressionUtilitiesTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

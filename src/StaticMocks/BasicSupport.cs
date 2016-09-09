@@ -4,6 +4,7 @@
     using System.Reflection;
     using System.Linq.Expressions;
     using System.Collections.Generic;
+    using ExpressionUtilities = StaticMock.ExpressionUtilities;
 
     public static class BasicSupport
     {
@@ -147,7 +148,7 @@
                 var argList = new List<object>();
                 foreach (var arg in methodCallExpression.Arguments)
                 {
-                    var value = StaticMock.Utilities.GetValue(arg);
+                    var value = ExpressionUtilities.GetValue(arg);
                     argList.Add(value);
                 }
 
