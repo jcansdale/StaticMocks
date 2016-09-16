@@ -5,7 +5,7 @@
     using NUnit.Framework;
     using System.Text;
 
-    public class StaticMockTests
+    public class BasicSupportTests
     {
         StaticMock staticMock;
 
