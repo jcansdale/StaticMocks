@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0-*",
+  "buildOptions": {
+  },
+
+  "dependencies": {
+    "BenchmarkDotNet.TestDriven": "0.9.9-develop",
+    "NSubstitute": "2.0.0-rc",
+    "StaticMocks": {
+      "target": "project"
+    }
+  },
+
+  "frameworks": {
+    "net452": { },
+    "netcoreapp1.0": {
+      "imports": "dnxcore50",
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0"
+        }
+      }
+    }
+  }
+}
