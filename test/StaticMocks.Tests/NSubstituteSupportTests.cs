@@ -43,6 +43,17 @@
         }
 
         [Test]
+        public void For_Action2()
+        {
+            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(Arg.Any<int>(), Arg.Any<int>()));
+
+            StaticClass.ActionMethod2(1, 2);
+
+            action.Received(1);
+            staticMock.For(() => Tests.StaticClass.ActionMethod(1, 2));
+        }
+
+        [Test]
         public void For_Func1_ExpectReturns()
         {
             var expectText = "__ExpectText1__";
@@ -190,6 +201,7 @@
         {
             internal static Action ActionMethod0 = () => Tests.StaticClass.ActionMethod();
             internal static Action<int> ActionMethod1 = (t1) => Tests.StaticClass.ActionMethod(t1);
+            internal static Action<int, int> ActionMethod2 = (t1, t2) => Tests.StaticClass.ActionMethod(t1, t2);
 
             internal static Func<string> FuncMethod0 = () => Tests.StaticClass.FuncMethod();
             internal static Func<int, string> FuncMethod1 = (t1) => Tests.StaticClass.FuncMethod(t1);
@@ -212,6 +224,7 @@
     {
         internal static void ActionMethod() { }
         internal static void ActionMethod(int t) { }
+        internal static void ActionMethod(int t1, int t2) { }
         internal static string FuncMethod() => "FuncMethod";
         internal static string FuncMethod(int t1) => "FuncMethod";
         internal static string FuncMethod(int t1, int t2) => "FuncMethod";

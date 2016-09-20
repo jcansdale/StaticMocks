@@ -77,6 +77,9 @@
                 case "Action`1":
                     type = typeof(IAction<>).MakeGenericType(delegateType.GenericTypeArguments);
                     break;
+                case "Action`2":
+                    type = typeof(IAction<,>).MakeGenericType(delegateType.GenericTypeArguments);
+                    break;
                 case "Func`1":
                     type = typeof(IFunc<>).MakeGenericType(delegateType.GenericTypeArguments);
                     break;
@@ -116,6 +119,7 @@
 
         public interface IAction { void Invoke(); }
         public interface IAction<T> { void Invoke(T t); }
+        public interface IAction<T1, T2> { void Invoke(T1 t1, T2 t2); }
         public interface IFunc<R> { R Invoke(); }
         public interface IFunc<T, R> { R Invoke(T t); }
         public interface IFunc<T1, T2, R> { R Invoke(T1 t1, T2 t2); }
