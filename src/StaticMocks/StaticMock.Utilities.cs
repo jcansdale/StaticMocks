@@ -14,7 +14,7 @@
                 var fieldDefiniton = CreateMockFieldDefinition(method);
                 var className = method.DeclaringType.Name;
                 var classDefinition = string.Format(
-    @"partial class {0}
+@"class {0}
 {{
     {1}
 }}", className, fieldDefiniton);

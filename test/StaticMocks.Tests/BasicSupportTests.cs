@@ -66,7 +66,8 @@
             catch (StaticMockException e)
             {
                 var classDefinition =
-@"partial class Directory
+@"
+class Directory
 {
     internal static Func<string, System.IO.DirectoryInfo> CreateDirectory = (string path) => System.IO.Directory.CreateDirectory(path);
 }";
