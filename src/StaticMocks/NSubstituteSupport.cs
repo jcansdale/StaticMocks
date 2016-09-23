@@ -80,6 +80,24 @@
                 case "Action`2":
                     type = typeof(IAction<,>).MakeGenericType(delegateType.GenericTypeArguments);
                     break;
+                case "Action`3":
+                    type = typeof(IAction<,,>).MakeGenericType(delegateType.GenericTypeArguments);
+                    break;
+                case "Action`4":
+                    type = typeof(IAction<,,,>).MakeGenericType(delegateType.GenericTypeArguments);
+                    break;
+                case "Action`5":
+                    type = typeof(IAction<,,,,>).MakeGenericType(delegateType.GenericTypeArguments);
+                    break;
+                case "Action`6":
+                    type = typeof(IAction<,,,,,>).MakeGenericType(delegateType.GenericTypeArguments);
+                    break;
+                case "Action`7":
+                    type = typeof(IAction<,,,,,,>).MakeGenericType(delegateType.GenericTypeArguments);
+                    break;
+                case "Action`8":
+                    type = typeof(IAction<,,,,,,,>).MakeGenericType(delegateType.GenericTypeArguments);
+                    break;
                 case "Func`1":
                     type = typeof(IFunc<>).MakeGenericType(delegateType.GenericTypeArguments);
                     break;
@@ -120,6 +138,12 @@
         public interface IAction { void Invoke(); }
         public interface IAction<T> { void Invoke(T t); }
         public interface IAction<T1, T2> { void Invoke(T1 t1, T2 t2); }
+        public interface IAction<T1, T2, T3> { void Invoke(T1 t1, T2 t2, T3 t3); }
+        public interface IAction<T1, T2, T3, T4> { void Invoke(T1 t1, T2 t2, T3 t3, T4 t4); }
+        public interface IAction<T1, T2, T3, T4, T5> { void Invoke(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5); }
+        public interface IAction<T1, T2, T3, T4, T5, T6> { void Invoke(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6); }
+        public interface IAction<T1, T2, T3, T4, T5, T6, T7> { void Invoke(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7); }
+        public interface IAction<T1, T2, T3, T4, T5, T6, T7, T8> { void Invoke(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8); }
         public interface IFunc<R> { R Invoke(); }
         public interface IFunc<T, R> { R Invoke(T t); }
         public interface IFunc<T1, T2, R> { R Invoke(T1 t1, T2 t2); }

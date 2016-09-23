@@ -34,7 +34,7 @@
         [Test]
         public void For_Action1()
         {
-            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(Arg.Any<int>()));
+            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(0));
 
             StaticClass.ActionMethod1(1);
 
@@ -45,12 +45,78 @@
         [Test]
         public void For_Action2()
         {
-            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(Arg.Any<int>(), Arg.Any<int>()));
+            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0));
 
             StaticClass.ActionMethod2(1, 2);
 
             action.Received(1);
             staticMock.For(() => Tests.StaticClass.ActionMethod(1, 2));
+        }
+
+        [Test]
+        public void For_Action3()
+        {
+            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0));
+
+            StaticClass.ActionMethod3(1, 2, 3);
+
+            action.Received(1);
+            staticMock.For(() => Tests.StaticClass.ActionMethod(1, 2, 3));
+        }
+
+        [Test]
+        public void For_Action4()
+        {
+            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0, 0));
+
+            StaticClass.ActionMethod4(1, 2, 3, 4);
+
+            action.Received(1);
+            staticMock.For(() => Tests.StaticClass.ActionMethod(1, 2, 3, 4));
+        }
+
+        [Test]
+        public void For_Action5()
+        {
+            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0, 0, 0));
+
+            StaticClass.ActionMethod5(1, 2, 3, 4, 5);
+
+            action.Received(1);
+            staticMock.For(() => Tests.StaticClass.ActionMethod(1, 2, 3, 4, 5));
+        }
+
+        [Test]
+        public void For_Action6()
+        {
+            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0, 0, 0, 0));
+
+            StaticClass.ActionMethod6(1, 2, 3, 4, 5, 6);
+
+            action.Received(1);
+            staticMock.For(() => Tests.StaticClass.ActionMethod(1, 2, 3, 4, 5, 6));
+        }
+
+        [Test]
+        public void For_Action7()
+        {
+            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0, 0, 0, 0, 0));
+
+            StaticClass.ActionMethod7(1, 2, 3, 4, 5, 6, 7);
+
+            action.Received(1);
+            staticMock.For(() => Tests.StaticClass.ActionMethod(1, 2, 3, 4, 5, 6, 7));
+        }
+
+        [Test]
+        public void For_Action8()
+        {
+            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0, 0, 0, 0, 0, 0));
+
+            StaticClass.ActionMethod8(1, 2, 3, 4, 5, 6, 7, 8);
+
+            action.Received(1);
+            staticMock.For(() => Tests.StaticClass.ActionMethod(1, 2, 3, 4, 5, 6, 7, 8));
         }
 
         [Test]
@@ -202,6 +268,12 @@
             internal static Action ActionMethod0 = () => Tests.StaticClass.ActionMethod();
             internal static Action<int> ActionMethod1 = (t1) => Tests.StaticClass.ActionMethod(t1);
             internal static Action<int, int> ActionMethod2 = (t1, t2) => Tests.StaticClass.ActionMethod(t1, t2);
+            internal static Action<int, int, int> ActionMethod3 = (t1, t2, t3) => Tests.StaticClass.ActionMethod(t1, t2, t3);
+            internal static Action<int, int, int, int> ActionMethod4 = (t1, t2, t3, t4) => Tests.StaticClass.ActionMethod(t1, t2, t3, t4);
+            internal static Action<int, int, int, int, int> ActionMethod5 = (t1, t2, t3, t4, t5) => Tests.StaticClass.ActionMethod(t1, t2, t3, t4, t5);
+            internal static Action<int, int, int, int, int, int> ActionMethod6 = (t1, t2, t3, t4, t5, t6) => Tests.StaticClass.ActionMethod(t1, t2, t3, t4, t5, t6);
+            internal static Action<int, int, int, int, int, int, int> ActionMethod7 = (t1, t2, t3, t4, t5, t6, t7) => Tests.StaticClass.ActionMethod(t1, t2, t3, t4, t5, t6, t7);
+            internal static Action<int, int, int, int, int, int, int, int> ActionMethod8 = (t1, t2, t3, t4, t5, t6, t7, t8) => Tests.StaticClass.ActionMethod(t1, t2, t3, t4, t5, t6, t7, t8);
 
             internal static Func<string> FuncMethod0 = () => Tests.StaticClass.FuncMethod();
             internal static Func<int, string> FuncMethod1 = (t1) => Tests.StaticClass.FuncMethod(t1);
@@ -225,6 +297,12 @@
         internal static void ActionMethod() { }
         internal static void ActionMethod(int t) { }
         internal static void ActionMethod(int t1, int t2) { }
+        internal static void ActionMethod(int t1, int t2, int t3) { }
+        internal static void ActionMethod(int t1, int t2, int t3, int t4) { }
+        internal static void ActionMethod(int t1, int t2, int t3, int t4, int t5) { }
+        internal static void ActionMethod(int t1, int t2, int t3, int t4, int t5, int t6) { }
+        internal static void ActionMethod(int t1, int t2, int t3, int t4, int t5, int t6, int t7) { }
+        internal static void ActionMethod(int t1, int t2, int t3, int t4, int t5, int t6, int t7, int t8) { }
         internal static string FuncMethod() => "FuncMethod";
         internal static string FuncMethod(int t1) => "FuncMethod";
         internal static string FuncMethod(int t1, int t2) => "FuncMethod";
