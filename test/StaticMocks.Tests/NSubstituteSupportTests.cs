@@ -263,7 +263,7 @@
             Assert.That(text2, Is.EqualTo(expect2));
         }
 
-        partial class StaticClass
+        class StaticClass
         {
             internal static Action ActionMethod0 = () => Tests.StaticClass.ActionMethod();
             internal static Action<int> ActionMethod1 = (t1) => Tests.StaticClass.ActionMethod(t1);
@@ -286,7 +286,7 @@
             internal static Func<int, int, int, int, int, int, int, int, string> FuncMethod8 = (t1, t2, t3, t4, t5, t6, t7, t8) => Tests.StaticClass.FuncMethod(t1, t2, t3, t4, t5, t6, t7, t8);
         }
 
-        partial class File
+        class File
         {
             internal static Func<string, string> ReadAllText = (string path) => System.IO.File.ReadAllText(path);
         }
