@@ -2,9 +2,9 @@
 
 #### Getting started
 
-1. Take the following target code.
+* Take the following target code.
 
-```c#
+ ```c#
     using System.IO;
 
     public class TargetClass
@@ -15,11 +15,11 @@
             return text.ToUpperInvariant();
         }
     }
-```
+ ```
 
-2. Install the *StaticMocks* package from NuGet (check 'Incude prerelease'). *StaticMocks* works nicely with *NSubstitute 2.0* and will automatically pull in that package. It also has a simple Moq-like interface if you need to remove the *NSubstitute* dependancy.
+* Install the *StaticMocks* package from NuGet (check 'Incude prerelease'). *StaticMocks* works nicely with *NSubstitute 2.0* and will automatically pull in that package. It also has a simple Moq-like interface if you need to remove the *NSubstitute* dependancy.
 
-3. Write the following test code.
+* Write the following test code.
 
 ```c#
     using System.IO;
@@ -43,7 +43,7 @@
         }
 ```
 
-4. Run the `ShoutFile` test. If you're using [TestDriven.Net](http://testdriven.net) you will see the following. It should work with other test runners.
+* Run the `ShoutFile` test. If you're using [TestDriven.Net](http://testdriven.net) you will see the following. It should work with other test runners.
 
 ```
 ------ Test started: Assembly: Target.Tests.dll ------
@@ -62,7 +62,7 @@ class File
 
 ```
 
-5. Do as the exception message suggests and change your target code to this.
+* Do as the exception message suggests and change your target code to this.
 
 ```c#
     using System;
@@ -82,7 +82,7 @@ class File
     }
 ```
 
-7. Run the `ShoutFile` test again and rejoice when the test passes!
+* Run the `ShoutFile` test again and rejoice when the test passes!
 
 #### Conclusion
 
