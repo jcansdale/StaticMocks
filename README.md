@@ -17,7 +17,7 @@
     }
  ```
 
-* Install the *StaticMocks* package from NuGet (check 'Incude prerelease'). *StaticMocks* works nicely with *NSubstitute 2.0* and will automatically pull in that package. It also has a simple Moq-like interface if you need to remove the *NSubstitute* dependancy.
+* Install the *StaticMocks* package from NuGet (check 'Incude prerelease'). *StaticMocks* works nicely with [NSubstitute 2.0](http://nsubstitute.github.io/) and will automatically pull in that package. It also has a simple Moq-like interface if you need to remove the *NSubstitute* dependancy.
 
 * Write the following test code.
 
@@ -41,9 +41,10 @@
                 Assert.That(text, Is.EqualTo("BAR"));
             }
         }
+    }
 ```
 
-* Run the `ShoutFile` test. If you're using [TestDriven.Net](http://testdriven.net) you will see the following. It should work with other test runners.
+* Run the `ShoutFile` test. If you're using [TestDriven.Net](http://testdriven.net) you will see the following.
 
 ```
 ------ Test started: Assembly: Target.Tests.dll ------
@@ -59,7 +60,6 @@ class File
 	Samples\Sample1.cs(17,0): at Samples.Tests.TargetClassTests.ShoutFile()
 
 0 passed, 1 failed, 0 skipped, took 0.67 seconds (NUnit 3.4.1).
-
 ```
 
 * Do as the exception message suggests and change your target code to this.
