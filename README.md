@@ -22,6 +22,7 @@
 * Write the following test code.
 
 ```c#
+    using System;
     using System.IO;
     using StaticMocks;
     using NSubstitute;
