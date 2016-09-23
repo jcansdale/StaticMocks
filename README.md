@@ -2,6 +2,8 @@
 
 #### Getting started
 
+*For convenience I've put the sample code [here](example.cs).*
+
 * Take the following target code.
 
  ```c#
