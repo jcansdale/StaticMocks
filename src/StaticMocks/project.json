@@ -1,5 +1,5 @@
 ﻿{
-  "version": "0.5.2-alpha-*",
+  "version": "0.6.0-beta-*",
   "runtimes": { "win": {} },
 
   "dependencies": {
@@ -16,7 +16,7 @@
     }
   },
 
-  "description": "A mocking framework capable of mocking static types in .NET and .NET Core.",
+  "description": "A mocking framework capable of mocking .NET and .NET Core static methods",
   "authors": [ "Jamie Cansdale" ],
 
   "packOptions": {
