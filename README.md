@@ -2,7 +2,7 @@
 
 #### Getting started
 
-*For convenience I've put the sample code [here](example.cs).*
+*For convenience I've put the sample code [here](https://raw.githubusercontent.com/jcansdale/StaticMocks/master/example.cs).*
 
 * Take the following target code.
 
