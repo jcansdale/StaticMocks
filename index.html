@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>StaticMocks by jcansdale</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">StaticMocks</h1>
+      <h2 class="project-tagline">A mocking library capable of mocking .NET and .NET Core static methods</h2>
+      <a href="https://github.com/jcansdale/StaticMocks" class="btn">View on GitHub</a>
+      <a href="https://github.com/jcansdale/StaticMocks/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/jcansdale/StaticMocks/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h3>
+<a id="a-mocking-library-capable-of-mocking-net-and-net-core-static-methods" class="anchor" href="#a-mocking-library-capable-of-mocking-net-and-net-core-static-methods" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>A mocking library capable of mocking .NET and .NET Core static methods</h3>
+
+<h4>
+<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting started</h4>
+
+<p><em>For convenience I've put the sample code <a href="example.cs">here</a>.</em></p>
+
+<ul>
+<li>
+<p>Take the following target code.</p>
+
+<div class="highlight highlight-source-cs"><pre>  <span class="pl-k">using</span> <span class="pl-en">System.IO</span>;
+
+  <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">TargetClass</span>
+  {
+      <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">string</span> <span class="pl-en">ShoutFile</span>(<span class="pl-k">string</span> <span class="pl-smi">path</span>)
+      {
+          <span class="pl-k">var</span> text = File.ReadAllText(path);
+          <span class="pl-k">return</span> text.ToUpperInvariant();
+      }
+  }</pre></div>
+</li>
+<li><p>Install the <em>StaticMocks</em> package from NuGet (check 'Incude prerelease'). <em>StaticMocks</em> works nicely with <a href="http://nsubstitute.github.io/">NSubstitute 2.0</a> and will automatically pull in that package. It also has a simple Moq-like interface if you need to remove the <em>NSubstitute</em> dependancy.</p></li>
+<li><p>Write the following test code.</p></li>
+</ul>
+
+<div class="highlight highlight-source-cs"><pre>    <span class="pl-k">using</span> <span class="pl-en">System</span>;
+    <span class="pl-k">using</span> <span class="pl-en">System.IO</span>;
+    <span class="pl-k">using</span> <span class="pl-en">StaticMocks</span>;
+    <span class="pl-k">using</span> <span class="pl-en">NSubstitute</span>;
+    <span class="pl-k">using</span> <span class="pl-en">NUnit.Framework</span>;
+
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">TargetClassTests</span>
+    {
+        [Test]
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">ShoutFile</span>()
+        {
+            <span class="pl-k">using</span> (<span class="pl-k">var</span> staticMock = <span class="pl-k">new</span> StaticMock(<span class="pl-k">typeof</span>(TargetClass)))
+            {
+                staticMock.For(() =&gt; File.ReadAllText(<span class="pl-s"><span class="pl-pds">"</span>foo.txt<span class="pl-pds">"</span></span>)).Returns(<span class="pl-s"><span class="pl-pds">"</span>bar<span class="pl-pds">"</span></span>);
+
+                <span class="pl-k">var</span> text = TargetClass.ShoutFile(<span class="pl-s"><span class="pl-pds">"</span>foo.txt<span class="pl-pds">"</span></span>);
+
+                Assert.That(text, Is.EqualTo(<span class="pl-s"><span class="pl-pds">"</span>BAR<span class="pl-pds">"</span></span>));
+            }
+        }
+    }</pre></div>
+
+<ul>
+<li>Run the <code>ShoutFile</code> test. If you're using <a href="http://testdriven.net">TestDriven.Net</a> you will see the following.</li>
+</ul>
+
+<pre><code>------ Test started: Assembly: Target.Tests.dll ------
+
+Test 'Target.Tests.TargetClassTests.ShoutFile' failed: StaticMocks.StaticMockException:
+
+Please add the following as a nested class to 'Target.Tests.TargetClass':
+
+class File
+{
+    internal static Func&lt;string, string&gt; ReadAllText = (string path) =&gt; System.IO.File.ReadAllText(path);
+}
+    Samples\Sample1.cs(17,0): at Samples.Tests.TargetClassTests.ShoutFile()
+
+0 passed, 1 failed, 0 skipped, took 0.67 seconds (NUnit 3.4.1).
+</code></pre>
+
+<ul>
+<li>Do as the exception message suggests and change your target code to this.</li>
+</ul>
+
+<div class="highlight highlight-source-cs"><pre>    <span class="pl-k">using</span> <span class="pl-en">System</span>;
+
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">TargetClass</span>
+    {
+        <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">string</span> <span class="pl-en">ShoutFile</span>(<span class="pl-k">string</span> <span class="pl-smi">path</span>)
+        {
+            <span class="pl-k">var</span> text = File.ReadAllText(path);
+            <span class="pl-k">return</span> text.ToUpperInvariant();
+        }
+
+        <span class="pl-k">class</span> <span class="pl-en">File</span>
+        {
+            <span class="pl-k">internal</span> <span class="pl-k">static</span> Func&lt;<span class="pl-k">string</span>, <span class="pl-k">string</span>&gt; ReadAllText = (<span class="pl-k">string</span> path) =&gt; System.IO.File.ReadAllText(path);
+        }
+    }</pre></div>
+
+<ul>
+<li>Run the <code>ShoutFile</code> test again and rejoice when the test passes!</li>
+</ul>
+
+<h4>
+<a id="conclusion" class="anchor" href="#conclusion" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Conclusion</h4>
+
+<p>You've just tested a static method without touching the public interface of
+its containing class or running your tests with a special tool. This was made
+possible by adding a single auto-generated field/class to the class under test.
+You could use <code>#if DEBUG</code> to remove this from the released assembly if you're
+so inclined.</p>
+
+<p>This is by no means perfect, but it's useful in a lot of common scenarios.
+I've been dogfooding it for a little while now.</p>
+
+<h4>
+<a id="faq" class="anchor" href="#faq" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>FAQ</h4>
+
+<p>Ask away in the issues section or tweet me! <a href="https://twitter.com/jcansdale">jcansdale@twitter.com</a></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/jcansdale/StaticMocks">StaticMocks</a> is maintained by <a href="https://github.com/jcansdale">jcansdale</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
