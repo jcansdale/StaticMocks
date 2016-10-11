@@ -112,6 +112,33 @@ class File
 </ul>
 
 <h4>
+<a id="what-about-verifying-that-a-static-method-was-called" class="anchor" href="#what-about-verifying-that-a-static-method-was-called" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What about verifying that a static method was called?</h4>
+
+<p>You can do this using <code>StaticMock.Received</code>. For example, the folowing method:</p>
+
+<div class="highlight highlight-source-cs"><pre>[Test]
+<span class="pl-k">public</span> <span class="pl-k">void</span> ShoutFile()
+{
+    <span class="pl-k">using</span> (<span class="pl-k">var</span> staticMock = <span class="pl-k">new</span> StaticMock(<span class="pl-k">typeof</span>(TargetClass)))
+    {
+        staticMock.For(() =&gt; File.ReadAllText(<span class="pl-s"><span class="pl-pds">"</span>foo.txt<span class="pl-pds">"</span></span>)).Returns(<span class="pl-s"><span class="pl-pds">"</span>bar<span class="pl-pds">"</span></span>);
+
+        <span class="pl-k">var</span> text = TargetClass.ShoutFile(<span class="pl-s"><span class="pl-pds">"</span>foo.txt<span class="pl-pds">"</span></span>);
+
+        staticMock.Received(<span class="pl-c1">1</span>, () =&gt; File.ReadAllText(<span class="pl-s"><span class="pl-pds">"</span>foo.txt<span class="pl-pds">"</span></span>));
+    }
+}</pre></div>
+
+<p>Will fail with the following:</p>
+
+<pre><code>Test 'ShoutFile' failed: NSubstitute.Exceptions.ReceivedCallsException : Expected to receive exactly 1 call matching:
+    Invoke("foo.txt")
+Actually received no matching calls.
+Received 1 non-matching call (non-matching arguments indicated with '*' characters):
+    Invoke(*"oops.txt"*)
+</code></pre>
+
+<h4>
 <a id="conclusion" class="anchor" href="#conclusion" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Conclusion</h4>
 
 <p>You've just tested a static method without touching the public interface of
