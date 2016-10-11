@@ -1,6 +1,7 @@
 ﻿namespace StaticMocks.Tests.StaticMocks.Tests
 {
     using NSubstitute;
+    using NSubstitute.Exceptions;
     using NUnit.Framework;
     using System;
 
@@ -21,102 +22,206 @@
         }
 
         [Test]
+        public void Received_LocalNull_ThrowsReceivedCallsException()
+        {
+            object ob = null;
+            staticMock.For(() => System.Diagnostics.Trace.WriteLine(ob));
+
+            Trace.WriteLine(ob);
+
+            Assert.Throws<ReceivedCallsException>(() =>
+            {
+                staticMock.Received(0, () => System.Diagnostics.Trace.WriteLine(ob));
+            });
+        }
+
+        [Test]
+        public void Received_Null_ThrowsReceivedCallsException()
+        {
+            staticMock.For(() => System.Diagnostics.Trace.WriteLine(null));
+
+            Trace.WriteLine(null);
+
+            Assert.Throws<ReceivedCallsException>(() =>
+            {
+                staticMock.Received(0, () => System.Diagnostics.Trace.WriteLine(null));
+            });
+        }
+
+        [Test]
+        public void Received_StringThenObject_ThrowsReceivedCallsException()
+        {
+            string nullString = null;
+            object nullObject = null;
+            staticMock.For(() => System.Diagnostics.Trace.WriteLine(nullString));
+
+            Trace.WriteLine(null);
+
+            Assert.Throws<ReceivedCallsException>(() =>
+            {
+                staticMock.Received(0, () => System.Diagnostics.Trace.WriteLine(nullObject));
+            });
+        }
+
+        [Test]
+        public void Received_ObjectThenString_ThrowsReceivedCallsException()
+        {
+            object nullObject = null;
+            string nullString = null;
+            staticMock.For(() => System.Diagnostics.Trace.WriteLine(nullObject));
+
+            Trace.WriteLine(null);
+
+            Assert.Throws<ReceivedCallsException>(() =>
+            {
+                staticMock.Received(0, () => System.Diagnostics.Trace.WriteLine(nullString));
+            });
+        }
+
+        [Test]
+        public void Received_ForNotCalled_ThrowsException()
+        {
+            // TODO: Should use StaticMockException.
+            var ex = Assert.Throws<Exception>(() =>
+            {
+                staticMock.Received(0, () => System.Diagnostics.Trace.WriteLine(null));
+            });
+
+            Assert.That(ex.Message, Is.EqualTo("Static methods must be substituted using `StaticMock.For` before they can be validated."));
+        }
+
+        class Trace
+        {
+            internal static Action<System.Object> WriteLine = (System.Object value) => System.Diagnostics.Trace.WriteLine(value);
+        }
+
+        [Test]
         public void For_Action0()
         {
-            var action = staticMock.For(() => Tests.StaticClass.ActionMethod());
+            staticMock.For(() => Tests.StaticClass.ActionMethod());
 
             StaticClass.ActionMethod0();
 
-            action.Received(1);
+            staticMock.Received(1, () => Tests.StaticClass.ActionMethod());
+        }
+
+        [Test]
+        public void For_Action0_ReceivedCallsException()
+        {
             staticMock.For(() => Tests.StaticClass.ActionMethod());
+
+            StaticClass.ActionMethod0();
+
+            Assert.Throws<ReceivedCallsException>(() =>
+            {
+                staticMock.Received(0, () => Tests.StaticClass.ActionMethod());
+            });
+        }
+
+        [Test]
+        public void Received_Action1_ReceivedCallsException()
+        {
+            staticMock.For(() => Tests.StaticClass.ActionMethod(0));
+
+            StaticClass.ActionMethod1(1);
+
+            Assert.Throws<ReceivedCallsException>(() =>
+            {
+                staticMock.Received(0, () => Tests.StaticClass.ActionMethod(1));
+            });
+        }
+
+        [Test]
+        public void Received_Action0Received2_NoException()
+        {
+            staticMock.For(() => Tests.StaticClass.ActionMethod());
+
+            StaticClass.ActionMethod0();
+            staticMock.Received(1, () => Tests.StaticClass.ActionMethod());
+
+            StaticClass.ActionMethod0();
+            staticMock.Received(2, () => Tests.StaticClass.ActionMethod());
         }
 
         [Test]
         public void For_Action1()
         {
-            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(0));
+            staticMock.For(() => Tests.StaticClass.ActionMethod(0));
 
             StaticClass.ActionMethod1(1);
 
-            action.Received(1);
-            staticMock.For(() => Tests.StaticClass.ActionMethod(1));
+            staticMock.Received(1, () => Tests.StaticClass.ActionMethod(1));
         }
 
         [Test]
         public void For_Action2()
         {
-            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0));
+            staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0));
 
             StaticClass.ActionMethod2(1, 2);
 
-            action.Received(1);
-            staticMock.For(() => Tests.StaticClass.ActionMethod(1, 2));
+            staticMock.Received(1, () => Tests.StaticClass.ActionMethod(1, 2));
         }
 
         [Test]
         public void For_Action3()
         {
-            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0));
+            staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0));
 
             StaticClass.ActionMethod3(1, 2, 3);
 
-            action.Received(1);
-            staticMock.For(() => Tests.StaticClass.ActionMethod(1, 2, 3));
+            staticMock.Received(1, () => Tests.StaticClass.ActionMethod(1, 2, 3));
         }
 
         [Test]
         public void For_Action4()
         {
-            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0, 0));
+            staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0, 0));
 
             StaticClass.ActionMethod4(1, 2, 3, 4);
 
-            action.Received(1);
-            staticMock.For(() => Tests.StaticClass.ActionMethod(1, 2, 3, 4));
+
+            staticMock.Received(1, () => Tests.StaticClass.ActionMethod(1, 2, 3, 4));
         }
 
         [Test]
         public void For_Action5()
         {
-            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0, 0, 0));
+            staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0, 0, 0));
 
             StaticClass.ActionMethod5(1, 2, 3, 4, 5);
 
-            action.Received(1);
-            staticMock.For(() => Tests.StaticClass.ActionMethod(1, 2, 3, 4, 5));
+            staticMock.Received(1, () => Tests.StaticClass.ActionMethod(1, 2, 3, 4, 5));
         }
 
         [Test]
         public void For_Action6()
         {
-            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0, 0, 0, 0));
+            staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0, 0, 0, 0));
 
             StaticClass.ActionMethod6(1, 2, 3, 4, 5, 6);
 
-            action.Received(1);
-            staticMock.For(() => Tests.StaticClass.ActionMethod(1, 2, 3, 4, 5, 6));
+            staticMock.Received(1, () => Tests.StaticClass.ActionMethod(1, 2, 3, 4, 5, 6));
         }
 
         [Test]
         public void For_Action7()
         {
-            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0, 0, 0, 0, 0));
+            staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0, 0, 0, 0, 0));
 
             StaticClass.ActionMethod7(1, 2, 3, 4, 5, 6, 7);
 
-            action.Received(1);
-            staticMock.For(() => Tests.StaticClass.ActionMethod(1, 2, 3, 4, 5, 6, 7));
+            staticMock.Received(1, () => Tests.StaticClass.ActionMethod(1, 2, 3, 4, 5, 6, 7));
         }
 
         [Test]
         public void For_Action8()
         {
-            var action = staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0, 0, 0, 0, 0, 0));
+            staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0, 0, 0, 0, 0, 0));
 
             StaticClass.ActionMethod8(1, 2, 3, 4, 5, 6, 7, 8);
 
-            action.Received(1);
-            staticMock.For(() => Tests.StaticClass.ActionMethod(1, 2, 3, 4, 5, 6, 7, 8));
+            staticMock.Received(1, () => Tests.StaticClass.ActionMethod(1, 2, 3, 4, 5, 6, 7, 8));
         }
 
         [Test]

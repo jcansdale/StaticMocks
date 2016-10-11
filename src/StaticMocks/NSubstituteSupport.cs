@@ -30,16 +30,31 @@
             return (R)mockDelegate.Delegate.DynamicInvoke(argList.ToArray());
         }
 
-        public static object For(this StaticMock staticMock, Expression<Action> target)
+        public static void For(this StaticMock staticMock, Expression<Action> target)
         {
             var methodCallExpression = (MethodCallExpression)target.Body;
             var method = methodCallExpression.Method;
 
             var mockDelegate = staticMock.GetMockDelegate(method);
-            if(!mockDelegate.IsMocked)
+            if (!mockDelegate.IsMocked)
             {
                 mockDelegate.Delegate = createDelegateFor(mockDelegate.DelegateType);
             }
+        }
+
+        public static object Received(this StaticMock staticMock, int count, Expression<Action> target)
+        {
+            var methodCallExpression = (MethodCallExpression)target.Body;
+            var method = methodCallExpression.Method;
+
+            var mockDelegate = staticMock.GetMockDelegate(method);
+            if (!mockDelegate.IsMocked)
+            {
+                throw new Exception("Static methods must be substituted using `StaticMock.For` before they can be validated.");
+            }
+
+            var action = mockDelegate.Delegate.Target;
+            action.Received(count);
 
             var argList = new List<object>();
             foreach (var arg in methodCallExpression.Arguments)
@@ -48,9 +63,15 @@
                 argList.Add(value);
             }
 
-            mockDelegate.Delegate.DynamicInvoke(argList.ToArray());
-            var action = mockDelegate.Delegate.Target;
-            action.ClearReceivedCalls();
+            try
+            {
+                mockDelegate.Delegate.DynamicInvoke(argList.ToArray());
+            }
+            catch (TargetInvocationException e)
+            {
+                throw e.InnerException;
+            }
+
             return action;
         }
 
@@ -65,7 +86,6 @@
             return (Delegate)Substitute.For(new Type[] { delegateType }, new object[0]);
         }
 
-        // TODO: Add support for all Actions and Funcs.
         static Delegate quickCreateDelegateFor(Type delegateType)
         {
             Type type;

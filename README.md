@@ -87,6 +87,35 @@ class File
 
 * Run the `ShoutFile` test again and rejoice when the test passes!
 
+#### What about verifying that a static method was called?
+
+You can do this using `StaticMock.Received`. For example, the folowing method:
+
+```c#
+[Test]
+public void ShoutFile()
+{
+    using (var staticMock = new StaticMock(typeof(TargetClass)))
+    {
+        staticMock.For(() => File.ReadAllText("foo.txt")).Returns("bar");
+
+        var text = TargetClass.ShoutFile("foo.txt");
+
+        staticMock.Received(1, () => File.ReadAllText("foo.txt"));
+    }
+}
+```
+
+Will fail with the following:
+
+```
+Test 'ShoutFile' failed: NSubstitute.Exceptions.ReceivedCallsException : Expected to receive exactly 1 call matching:
+	Invoke("foo.txt")
+Actually received no matching calls.
+Received 1 non-matching call (non-matching arguments indicated with '*' characters):
+	Invoke(*"oops.txt"*)
+```
+
 #### Conclusion
 
 You've just tested a static method without touching the public interface of

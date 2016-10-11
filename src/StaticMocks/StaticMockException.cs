@@ -14,7 +14,9 @@
         {
             var classDefinition = StaticMock.Utilities.CreateMockClassDefinition(method);
             return string.Format(
-@"Please add the following as a nested class to '{0}':
+@"
+
+Please add the following as a nested class to '{0}':
 
 {1}", targetType.FullName, classDefinition);
         }
