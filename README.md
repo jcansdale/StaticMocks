@@ -19,7 +19,7 @@
     }
  ```
 
-* Install the *StaticMocks* package from NuGet (check 'Incude prerelease'). *StaticMocks* works nicely with [NSubstitute 2.0](http://nsubstitute.github.io/) and will automatically pull in that package. It also has a simple Moq-like interface if you need to remove the *NSubstitute* dependancy.
+* Install the *StaticMocks* package from NuGet (check 'Incude prerelease'). *StaticMocks* works nicely with [NSubstitute 2.0](http://nsubstitute.github.io/) and will automatically pull in that package. It also has a simple Moq-like interface if you need to remove the *NSubstitute* dependency.
 
 * Write the following test code.
 
@@ -89,7 +89,7 @@ class File
 
 #### What about verifying that a static method was called?
 
-You can do this using `StaticMock.Received`. For example, the folowing method:
+You can do this using `StaticMock.Received`. For example, the following method:
 
 ```c#
 [Test]
