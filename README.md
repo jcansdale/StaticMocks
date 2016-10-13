@@ -87,7 +87,7 @@ class File
 
 * Run the `ShoutFile` test again and rejoice when the test passes!
 
-#### What about verifying that a static method was called?
+#### How can you verify that a static method was called?
 
 You can do this using `StaticMock.Received`. For example, the following method:
 
@@ -115,6 +115,80 @@ Actually received no matching calls.
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 	Invoke(*"oops.txt"*)
 ```
+
+#### What happens if tests are being run in parallel?
+
+*StaticMocks* enforces a rule that a target type can only be mocked by one `StaticMock` at a time.
+If a parallel test attempts to mock a type more than once, the test will fail with a `StaticMockException`.
+
+For example, the tests below will fail with the following message (to fix this error, uncomment the `[Collection("ReaderTests")]` attributes).
+
+```
+------ Test started: Assembly: StaticMocks.ParallelTests.dll ------
+
+Test 'ParallelTests.FooTests.Test' failed: StaticMocks.StaticMockException : There is already an active `StaticMock` for type `Reader`.
+If you're using xUnit, ensure that test classes that create a `StaticMock` for `Reader` belong to the same collection.
+For example, you could add [Collection("ReaderTests")] to these classes.
+	StaticMocks.ParallelTests\Class1.cs(15,0): at ParallelTests.FooTests.Test()
+
+1 passed, 1 failed, 0 skipped, took 0.71 seconds (xUnit.net 2.2.0 build 3402).
+```
+
+```c#
+namespace ParallelTests
+{
+    using System;
+    using System.IO;
+    using Xunit;
+    using NSubstitute;
+    using StaticMocks;
+
+    // [Collection("ReaderTests")]
+    public class FooTests
+    {
+        [Fact]
+        public void Test()
+        {
+            using (var staticMock = new StaticMock(typeof(Reader)))
+            {
+                staticMock.For(() => File.ReadAllText("readme.txt")).Returns("foo");
+                Assert.Equal("foo", Reader.ReadAllText("readme.txt"));
+            }
+        }
+    }
+
+    // [Collection("ReaderTests")]
+    public class BarTests
+    {
+        [Fact]
+        public void Test()
+        {
+            using (var staticMock = new StaticMock(typeof(Reader)))
+            {
+                staticMock.For(() => File.ReadAllText("readme.txt")).Returns("bar");
+                Assert.Equal("bar", Reader.ReadAllText("readme.txt"));
+            }
+        }
+    }
+
+    public class Reader
+    {
+        public static string ReadAllText(string path)
+        {
+            return File.ReadAllText(path);
+        }
+
+        class File
+        {
+            internal static Func<string, string> ReadAllText = (string path) => System.IO.File.ReadAllText(path);
+        }
+    }
+}
+```
+
+The `[Collection(...)]` attributes are only necessary when a target class is being mocked by multiple xUnit test fixtures.
+By default NUnit doesn't do parallel testing of fixtures, so this shouldn't be an issue unless you explicitly enable it.
+
 
 #### Conclusion
 

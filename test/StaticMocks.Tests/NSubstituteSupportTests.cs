@@ -22,29 +22,43 @@
         }
 
         [Test]
+        public void For_StaticMockCollision_ThrowsException()
+        {
+            var targetType = GetType();
+            var expectMessage = StaticMockException.AlreadyActiveMessage(targetType);
+
+            var ex = Assert.Throws<StaticMockException>(() =>
+            {
+                using (var staticMock2 = new StaticMock(targetType)) { }
+            });
+
+            Assert.That(ex.Message, Is.EqualTo(expectMessage));
+        }
+
+        [Test]
         public void Received_LocalNull_ThrowsReceivedCallsException()
         {
             object ob = null;
-            staticMock.For(() => System.Diagnostics.Trace.WriteLine(ob));
+            staticMock.For(() => Example.Trace.WriteLine(ob));
 
             Trace.WriteLine(ob);
 
             Assert.Throws<ReceivedCallsException>(() =>
             {
-                staticMock.Received(0, () => System.Diagnostics.Trace.WriteLine(ob));
+                staticMock.Received(0, () => Example.Trace.WriteLine(ob));
             });
         }
 
         [Test]
         public void Received_Null_ThrowsReceivedCallsException()
         {
-            staticMock.For(() => System.Diagnostics.Trace.WriteLine(null));
+            staticMock.For(() => Example.Trace.WriteLine(null));
 
             Trace.WriteLine(null);
 
             Assert.Throws<ReceivedCallsException>(() =>
             {
-                staticMock.Received(0, () => System.Diagnostics.Trace.WriteLine(null));
+                staticMock.Received(0, () => Example.Trace.WriteLine(null));
             });
         }
 
@@ -53,13 +67,13 @@
         {
             string nullString = null;
             object nullObject = null;
-            staticMock.For(() => System.Diagnostics.Trace.WriteLine(nullString));
+            staticMock.For(() => Example.Trace.WriteLine(nullString));
 
             Trace.WriteLine(null);
 
             Assert.Throws<ReceivedCallsException>(() =>
             {
-                staticMock.Received(0, () => System.Diagnostics.Trace.WriteLine(nullObject));
+                staticMock.Received(0, () => Example.Trace.WriteLine(nullObject));
             });
         }
 
@@ -68,26 +82,34 @@
         {
             object nullObject = null;
             string nullString = null;
-            staticMock.For(() => System.Diagnostics.Trace.WriteLine(nullObject));
+            staticMock.For(() => Example.Trace.WriteLine(nullObject));
 
             Trace.WriteLine(null);
 
             Assert.Throws<ReceivedCallsException>(() =>
             {
-                staticMock.Received(0, () => System.Diagnostics.Trace.WriteLine(nullString));
+                staticMock.Received(0, () => Example.Trace.WriteLine(nullString));
             });
         }
 
         [Test]
         public void Received_ForNotCalled_ThrowsException()
         {
-            // TODO: Should use StaticMockException.
-            var ex = Assert.Throws<Exception>(() =>
+            var ex = Assert.Throws<StaticMockException>(() =>
             {
-                staticMock.Received(0, () => System.Diagnostics.Trace.WriteLine(null));
+                staticMock.Received(0, () => Example.Trace.WriteLine(null));
             });
 
             Assert.That(ex.Message, Is.EqualTo("Static methods must be substituted using `StaticMock.For` before they can be validated."));
+        }
+
+        class Example
+        {
+            internal class Trace
+            {
+                internal static void WriteLine(object ob) { }
+                internal static void WriteLine(string text) { }
+            }
         }
 
         class Trace
@@ -179,7 +201,6 @@
             staticMock.For(() => Tests.StaticClass.ActionMethod(0, 0, 0, 0));
 
             StaticClass.ActionMethod4(1, 2, 3, 4);
-
 
             staticMock.Received(1, () => Tests.StaticClass.ActionMethod(1, 2, 3, 4));
         }

@@ -6,23 +6,53 @@
 
     public partial class StaticMock : IDisposable
     {
+        static IDictionary<Type, StaticMock> staticMocks = new Dictionary<Type, StaticMock>();
+
         Type targetType;
         IDictionary<FieldInfo, MockDelegate> mockDelegates;
 
         public StaticMock(Type targetType)
         {
+            activate(targetType, this);
             this.targetType = targetType;
             mockDelegates = new Dictionary<FieldInfo, MockDelegate>();
         }
 
         public void Dispose()
         {
-            foreach(var mockTarget in mockDelegates.Values)
+            if (mockDelegates == null)
+            {
+                return;
+            }
+
+            foreach (var mockTarget in mockDelegates.Values)
             {
                 mockTarget.Dispose();
             }
 
             mockDelegates = null;
+            deactivate(targetType);
+        }
+
+        static void activate(Type type, StaticMock staticMock)
+        {
+            lock (staticMocks)
+            {
+                if (staticMocks.ContainsKey(type))
+                {
+                    throw new StaticMockException(StaticMockException.AlreadyActiveMessage(type));
+                }
+
+                staticMocks.Add(type, staticMock);
+            }
+        }
+
+        static void deactivate(Type type)
+        {
+            lock (staticMocks)
+            {
+                staticMocks.Remove(type);
+            }
         }
 
         public MockDelegate GetMockDelegate(MethodInfo method)
@@ -39,14 +69,13 @@
             return mockDelegate;
         }
 
-
         static FieldInfo getMockField(Type targetType, MethodInfo method)
         {
             var mockTypeName = method.DeclaringType.Name;
             var mockType = targetType.GetTypeInfo().GetNestedType(mockTypeName, BindingFlags.Public | BindingFlags.NonPublic);
             if (mockType == null)
             {
-                throw new StaticMockException(targetType, method);
+                throw new StaticMockException(StaticMockException.SuggestSourceMessage(targetType, method));
             }
 
             var mockFieldName = method.Name + method.GetParameters().Length;
@@ -63,7 +92,7 @@
                 return field;
             }
 
-            throw new StaticMockException(targetType, method);
+            throw new StaticMockException(StaticMockException.SuggestSourceMessage(targetType, method));
         }
     }
 }

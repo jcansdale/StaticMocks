@@ -5,12 +5,19 @@
 
     public class StaticMockException : Exception
     {
-        internal StaticMockException(Type targetType, MethodInfo method) :
-            base(createMessage(targetType, method))
+        public StaticMockException(string message) :
+            base(message)
         {
         }
 
-        static string createMessage(Type targetType, MethodInfo method)
+        public static string AlreadyActiveMessage(Type targetType)
+        {
+            return string.Format(@"There is already an active `StaticMock` for type `{0}`.
+If you're using xUnit, ensure that test classes that create a `StaticMock` for `{0}` belong to the same collection.
+For example, you could add [Collection(""{0}Tests"")] to these classes.", targetType.Name);
+        }
+
+        public static string SuggestSourceMessage(Type targetType, MethodInfo method)
         {
             var classDefinition = StaticMock.Utilities.CreateMockClassDefinition(method);
             return string.Format(
