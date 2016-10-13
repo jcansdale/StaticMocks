@@ -42,7 +42,7 @@
       }
   }</pre></div>
 </li>
-<li><p>Install the <em>StaticMocks</em> package from NuGet (check 'Incude prerelease'). <em>StaticMocks</em> works nicely with <a href="http://nsubstitute.github.io/">NSubstitute 2.0</a> and will automatically pull in that package. It also has a simple Moq-like interface if you need to remove the <em>NSubstitute</em> dependancy.</p></li>
+<li><p>Install the <em>StaticMocks</em> package from NuGet (check 'Incude prerelease'). <em>StaticMocks</em> works nicely with <a href="http://nsubstitute.github.io/">NSubstitute 2.0</a> and will automatically pull in that package. It also has a simple Moq-like interface if you need to remove the <em>NSubstitute</em> dependency.</p></li>
 <li><p>Write the following test code.</p></li>
 </ul>
 
@@ -112,9 +112,9 @@ class File
 </ul>
 
 <h4>
-<a id="what-about-verifying-that-a-static-method-was-called" class="anchor" href="#what-about-verifying-that-a-static-method-was-called" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What about verifying that a static method was called?</h4>
+<a id="how-can-you-verify-that-a-static-method-was-called" class="anchor" href="#how-can-you-verify-that-a-static-method-was-called" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How can you verify that a static method was called?</h4>
 
-<p>You can do this using <code>StaticMock.Received</code>. For example, the folowing method:</p>
+<p>You can do this using <code>StaticMock.Received</code>. For example, the following method:</p>
 
 <div class="highlight highlight-source-cs"><pre>[Test]
 <span class="pl-k">public</span> <span class="pl-k">void</span> ShoutFile()
@@ -137,6 +137,77 @@ Actually received no matching calls.
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
     Invoke(*"oops.txt"*)
 </code></pre>
+
+<h4>
+<a id="what-happens-if-tests-are-being-run-in-parallel" class="anchor" href="#what-happens-if-tests-are-being-run-in-parallel" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What happens if tests are being run in parallel?</h4>
+
+<p><em>StaticMocks</em> enforces a rule that a target type can only be mocked by one <code>StaticMock</code> at a time.
+If a parallel test attempts to mock a type more than once, the test will fail with a <code>StaticMockException</code>.</p>
+
+<p>For example, the tests below will fail with the following message (to fix this error, uncomment the <code>[Collection("ReaderTests")]</code> attributes).</p>
+
+<pre><code>------ Test started: Assembly: StaticMocks.ParallelTests.dll ------
+
+Test 'ParallelTests.FooTests.Test' failed: StaticMocks.StaticMockException : There is already an active `StaticMock` for type `Reader`.
+If you're using xUnit, ensure that test classes that create a `StaticMock` for `Reader` belong to the same collection.
+For example, you could add [Collection("ReaderTests")] to these classes.
+    StaticMocks.ParallelTests\Class1.cs(15,0): at ParallelTests.FooTests.Test()
+
+1 passed, 1 failed, 0 skipped, took 0.71 seconds (xUnit.net 2.2.0 build 3402).
+</code></pre>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">namespace</span> <span class="pl-en">ParallelTests</span>
+{
+    <span class="pl-k">using</span> <span class="pl-en">System</span>;
+    <span class="pl-k">using</span> <span class="pl-en">System.IO</span>;
+    <span class="pl-k">using</span> <span class="pl-en">Xunit</span>;
+    <span class="pl-k">using</span> <span class="pl-en">NSubstitute</span>;
+    <span class="pl-k">using</span> <span class="pl-en">StaticMocks</span>;
+
+    <span class="pl-c">// [Collection("ReaderTests")]</span>
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">FooTests</span>
+    {
+        [Fact]
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Test</span>()
+        {
+            <span class="pl-k">using</span> (<span class="pl-k">var</span> staticMock = <span class="pl-k">new</span> StaticMock(<span class="pl-k">typeof</span>(Reader)))
+            {
+                staticMock.For(() =&gt; File.ReadAllText(<span class="pl-s"><span class="pl-pds">"</span>readme.txt<span class="pl-pds">"</span></span>)).Returns(<span class="pl-s"><span class="pl-pds">"</span>foo<span class="pl-pds">"</span></span>);
+                Assert.Equal(<span class="pl-s"><span class="pl-pds">"</span>foo<span class="pl-pds">"</span></span>, Reader.ReadAllText(<span class="pl-s"><span class="pl-pds">"</span>readme.txt<span class="pl-pds">"</span></span>));
+            }
+        }
+    }
+
+    <span class="pl-c">// [Collection("ReaderTests")]</span>
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">BarTests</span>
+    {
+        [Fact]
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Test</span>()
+        {
+            <span class="pl-k">using</span> (<span class="pl-k">var</span> staticMock = <span class="pl-k">new</span> StaticMock(<span class="pl-k">typeof</span>(Reader)))
+            {
+                staticMock.For(() =&gt; File.ReadAllText(<span class="pl-s"><span class="pl-pds">"</span>readme.txt<span class="pl-pds">"</span></span>)).Returns(<span class="pl-s"><span class="pl-pds">"</span>bar<span class="pl-pds">"</span></span>);
+                Assert.Equal(<span class="pl-s"><span class="pl-pds">"</span>bar<span class="pl-pds">"</span></span>, Reader.ReadAllText(<span class="pl-s"><span class="pl-pds">"</span>readme.txt<span class="pl-pds">"</span></span>));
+            }
+        }
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Reader</span>
+    {
+        <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">string</span> <span class="pl-en">ReadAllText</span>(<span class="pl-k">string</span> <span class="pl-smi">path</span>)
+        {
+            <span class="pl-k">return</span> File.ReadAllText(path);
+        }
+
+        <span class="pl-k">class</span> <span class="pl-en">File</span>
+        {
+            <span class="pl-k">internal</span> <span class="pl-k">static</span> Func&lt;<span class="pl-k">string</span>, <span class="pl-k">string</span>&gt; ReadAllText = (<span class="pl-k">string</span> path) =&gt; System.IO.File.ReadAllText(path);
+        }
+    }
+}</pre></div>
+
+<p>The <code>[Collection(...)]</code> attributes are only necessary when a target class is being mocked by multiple xUnit test fixtures.
+By default NUnit doesn't do parallel testing of fixtures, so this shouldn't be an issue unless you explicitly enable it.</p>
 
 <h4>
 <a id="conclusion" class="anchor" href="#conclusion" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Conclusion</h4>
