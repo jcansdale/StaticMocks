@@ -12,13 +12,7 @@
         public static R For<R>(this StaticMock staticMock, Expression<Func<R>> target)
         {
             var methodCallExpression = (MethodCallExpression)target.Body;
-            var method = methodCallExpression.Method;
-
-            var mockDelegate = staticMock.GetMockDelegate(method);
-            if (!mockDelegate.IsMocked)
-            {
-                mockDelegate.Delegate = createDelegateFor(mockDelegate.DelegateType);
-            }
+            var mockDelegate = getMockDelegate(staticMock, methodCallExpression.Method);
 
             var argList = new List<object>();
             foreach (var arg in methodCallExpression.Arguments)
@@ -33,13 +27,18 @@
         public static void For(this StaticMock staticMock, Expression<Action> target)
         {
             var methodCallExpression = (MethodCallExpression)target.Body;
-            var method = methodCallExpression.Method;
+            getMockDelegate(staticMock, methodCallExpression.Method);
+        }
 
+        static MockDelegate getMockDelegate(StaticMock staticMock, MethodInfo method)
+        {
             var mockDelegate = staticMock.GetMockDelegate(method);
             if (!mockDelegate.IsMocked)
             {
                 mockDelegate.Delegate = createDelegateFor(mockDelegate.DelegateType);
             }
+
+            return mockDelegate;
         }
 
         public static object Received(this StaticMock staticMock, int count, Expression<Action> target)
@@ -50,7 +49,7 @@
             var mockDelegate = staticMock.GetMockDelegate(method);
             if (!mockDelegate.IsMocked)
             {
-                throw new Exception("Static methods must be substituted using `StaticMock.For` before they can be validated.");
+                throw new StaticMockException("Static methods must be substituted using `StaticMock.For` before they can be validated.");
             }
 
             var action = mockDelegate.Delegate.Target;
@@ -76,17 +75,6 @@
         }
 
         static Delegate createDelegateFor(Type delegateType)
-        {
-            var dele = quickCreateDelegateFor(delegateType);
-            if(dele != null)
-            {
-                return dele;
-            }
-
-            return (Delegate)Substitute.For(new Type[] { delegateType }, new object[0]);
-        }
-
-        static Delegate quickCreateDelegateFor(Type delegateType)
         {
             Type type;
             switch (delegateType.Name)
@@ -146,8 +134,9 @@
                     type = typeof(IFunc<,,,,,,,,>).MakeGenericType(delegateType.GenericTypeArguments);
                     break;
                 default:
-                    throw new Exception("Unsupported delegate type: " + delegateType.Name);
-                    //return null;
+                    // This would be slow.
+                    // return (Delegate)Substitute.For(new Type[] { delegateType }, new object[0]);
+                    throw new StaticMockException("Unsupported delegate type: " + delegateType.Name);
             }
 
             var target = Substitute.For(new Type[] { type }, new object[0]);
