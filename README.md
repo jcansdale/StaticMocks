@@ -121,7 +121,7 @@ Received 1 non-matching call (non-matching arguments indicated with '*' characte
 *StaticMocks* enforces a rule that a target type can only be mocked by one `StaticMock` at a time.
 If a parallel test attempts to mock a type more than once, the test will fail with a `StaticMockException`.
 
-For example, the tests below will fail with the following message (to fix this error, uncomment the `[Collection("ReaderTests")]` attributes).
+For example, the tests below will fail with the following message:
 
 ```
 ------ Test started: Assembly: StaticMocks.ParallelTests.dll ------
@@ -133,6 +133,8 @@ For example, you could add [Collection("ReaderTests")] to these classes.
 
 1 passed, 1 failed, 0 skipped, took 0.71 seconds (xUnit.net 2.2.0 build 3402).
 ```
+
+To fix this error, uncomment the `[Collection("ReaderTests")]` attributes.
 
 ```c#
 namespace ParallelTests
