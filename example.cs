@@ -27,13 +27,35 @@ public class TargetClassTests
         using (var staticMock = new StaticMock(typeof(ClassUsesConsole)))
         {
             var text = "Hello, World!";
-            staticMock.For(() => Console.WriteLine(""));
+            staticMock.For(() => Console.WriteLine(Arg.Any<string>()));
 
             ClassUsesConsole.WriteLine(text);
 
             staticMock.Received(1, () => Console.WriteLine(text));
         }
     }
+
+    [Test]
+    public void MockStaticDefaultThrows()
+    {
+        using (var staticMock = new StaticMock(typeof(ClassUsesFile)))
+        {
+            staticMock.For(() => File.ReadAllText(null)).ReturnsForAnyArgs(x =>
+            {
+                switch(x.ArgAt<string>(0))
+                {
+                    case "foo.txt":
+                        return "bar";
+                    default:
+                        throw new FileNotFoundException();
+                }
+            });
+
+            Assert.That(ClassUsesFile.ShoutFile("foo.txt"), Is.EqualTo("BAR"));
+            Assert.Throws<FileNotFoundException>(() => ClassUsesFile.ShoutFile("boom.txt"));
+        }
+    }
+
 }
 
 public class ClassUsesFile
