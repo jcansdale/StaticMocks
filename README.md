@@ -116,6 +116,29 @@ Received 1 non-matching call (non-matching arguments indicated with '*' characte
 	Invoke(*"oops.txt"*)
 ```
 
+#### How do I specify default values or exceptions?
+
+For methods that return a simple value, you can specify the default `Returns` value before the specific values. For example:
+
+```c#
+staticMock.For(() => File.Exists(null)).ReturnsForAnyArgs(false);
+staticMock.For(() => File.Exists("foo.txt")).Returns(true);
+```
+
+Alternatively, you can call `ReturnsForAll` *after* specifying your `Returns`.
+
+```c#
+staticMock.For(() => File.Exists("foo.txt")).Returns(true);
+staticMock.ReturnsForAll(false);
+```
+
+If you need to throw an exception in the default case, you can call `ThrowsForAll` *after* specifying your `Returns`.
+
+```c#
+staticMock.For(() => File.ReadAllText("foo.txt")).Returns("bar");
+staticMock.ThrowsForAll(new FileNotFoundException());
+```
+
 #### What happens if tests are being run in parallel?
 
 *StaticMocks* enforces a rule that a target type can only be mocked by one `StaticMock` at a time.
@@ -190,29 +213,6 @@ namespace ParallelTests
 
 The `[Collection(...)]` attributes are only necessary when a target class is being mocked by multiple xUnit test fixtures.
 By default NUnit doesn't do parallel testing of fixtures, so this shouldn't be an issue unless you explicitly enable it.
-
-#### How do I specify default values or exceptions?
-
-For methods that return a simple value, you can specify the default `Returns` value before the specific values. For example:
-
-```c#
-staticMock.For(() => File.Exists(null)).ReturnsForAnyArgs(false);
-staticMock.For(() => File.Exists("foo.txt")).Returns(true);
-```
-
-Alternatively, you can call `ReturnsForAll` *after* specifying your `Returns`.
-
-```c#
-staticMock.For(() => File.Exists("foo.txt")).Returns(true);
-staticMock.ReturnsForAll(false);
-```
-
-If you need to throw an exception in the default case, you can call `ThrowsForAll` *after* specifying your `Returns`.
-
-```c#
-staticMock.For(() => File.ReadAllText("foo.txt")).Returns("bar");
-staticMock.ThrowsForAll(new FileNotFoundException());
-```
 
 #### Conclusion
 
