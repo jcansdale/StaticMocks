@@ -144,7 +144,7 @@ Received 1 non-matching call (non-matching arguments indicated with '*' characte
 <p><em>StaticMocks</em> enforces a rule that a target type can only be mocked by one <code>StaticMock</code> at a time.
 If a parallel test attempts to mock a type more than once, the test will fail with a <code>StaticMockException</code>.</p>
 
-<p>For example, the tests below will fail with the following message (to fix this error, uncomment the <code>[Collection("ReaderTests")]</code> attributes).</p>
+<p>For example, the tests below will fail with the following message:</p>
 
 <pre><code>------ Test started: Assembly: StaticMocks.ParallelTests.dll ------
 
@@ -155,6 +155,8 @@ For example, you could add [Collection("ReaderTests")] to these classes.
 
 1 passed, 1 failed, 0 skipped, took 0.71 seconds (xUnit.net 2.2.0 build 3402).
 </code></pre>
+
+<p>To fix this error, uncomment the <code>[Collection("ReaderTests")]</code> attributes.</p>
 
 <div class="highlight highlight-source-cs"><pre><span class="pl-k">namespace</span> <span class="pl-en">ParallelTests</span>
 {
@@ -208,6 +210,24 @@ For example, you could add [Collection("ReaderTests")] to these classes.
 
 <p>The <code>[Collection(...)]</code> attributes are only necessary when a target class is being mocked by multiple xUnit test fixtures.
 By default NUnit doesn't do parallel testing of fixtures, so this shouldn't be an issue unless you explicitly enable it.</p>
+
+<h4>
+<a id="how-do-i-specify-default-values-or-exceptions" class="anchor" href="#how-do-i-specify-default-values-or-exceptions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How do I specify default values or exceptions?</h4>
+
+<p>For methods that return a simple value, you can specify the default <code>Returns</code> value before the specific values. For example:</p>
+
+<div class="highlight highlight-source-cs"><pre>staticMock.For(() =&gt; File.Exists(<span class="pl-c1">null</span>)).ReturnsForAnyArgs(<span class="pl-c1">false</span>);
+staticMock.For(() =&gt; File.Exists(<span class="pl-s"><span class="pl-pds">"</span>foo.txt<span class="pl-pds">"</span></span>)).Returns(<span class="pl-c1">true</span>);</pre></div>
+
+<p>Alternatively, you can call <code>ReturnsForAll</code> <em>after</em> specifying your <code>Returns</code>.</p>
+
+<div class="highlight highlight-source-cs"><pre>staticMock.For(() =&gt; File.Exists(<span class="pl-s"><span class="pl-pds">"</span>foo.txt<span class="pl-pds">"</span></span>)).Returns(<span class="pl-c1">true</span>);
+staticMock.ReturnsForAll(<span class="pl-c1">false</span>);</pre></div>
+
+<p>If you need to throw an exception in the default case, you can call <code>ThrowsForAll</code> <em>after</em> specifying your <code>Returns</code>.</p>
+
+<div class="highlight highlight-source-cs"><pre>staticMock.For(() =&gt; File.ReadAllText(<span class="pl-s"><span class="pl-pds">"</span>foo.txt<span class="pl-pds">"</span></span>)).Returns(<span class="pl-s"><span class="pl-pds">"</span>bar<span class="pl-pds">"</span></span>);
+staticMock.ThrowsForAll(<span class="pl-k">new</span> FileNotFoundException());</pre></div>
 
 <h4>
 <a id="conclusion" class="anchor" href="#conclusion" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Conclusion</h4>
