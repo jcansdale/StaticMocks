@@ -1,6 +1,8 @@
 ﻿namespace StaticMocks
 {
     using NSubstitute;
+    using NSubstitute.Core;
+    using NSubstitute.Extensions;
     using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
@@ -39,6 +41,51 @@
             }
 
             return mockDelegate;
+        }
+
+        public static void ReturnsForAll<T>(this StaticMock staticMock, Func<CallInfo, T> returnThis)
+        {
+            var mockDelegate = staticMock.LastMockDelegate;
+            if (mockDelegate == null)
+            {
+                throw new StaticMockException(StaticMockException.ReturnsForAllMessage());
+            }
+
+            mockDelegate.Delegate.Target.ReturnsForAll(returnThis);
+        }
+
+        public static void ReturnsForAll<T>(this StaticMock staticMock, T returnThis)
+        {
+            var mockDelegate = staticMock.LastMockDelegate;
+            if (mockDelegate == null)
+            {
+                throw new StaticMockException(StaticMockException.ReturnsForAllMessage());
+            }
+
+            mockDelegate.Delegate.Target.ReturnsForAll(returnThis);
+        }
+
+        public static void ThrowsForAll(this StaticMock staticMock, Exception exception)
+        {
+            var mockDelegate = staticMock.LastMockDelegate;
+            if (mockDelegate == null)
+            {
+                throw new StaticMockException(StaticMockException.ReturnsForAllMessage());
+            }
+
+            var returnType = mockDelegate.Delegate.GetMethodInfo().ReturnType;
+            var throwsForAllMethod = typeof(NSubstituteSupport).GetMethod(nameof(throwsForAll),
+                BindingFlags.Static | BindingFlags.NonPublic);
+            var genericMethod = throwsForAllMethod.MakeGenericMethod(returnType);
+            genericMethod.Invoke(null, new object[] { mockDelegate.Delegate.Target, exception });
+        }
+
+        static void throwsForAll<T>(object target, Exception exception)
+        {
+            target.ReturnsForAll<T>(_ =>
+            {
+                throw exception;
+            });
         }
 
         public static object Received(this StaticMock staticMock, int count, Expression<Action> target)

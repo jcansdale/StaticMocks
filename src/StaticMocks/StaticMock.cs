@@ -66,8 +66,11 @@
                 mockDelegates[field] = mockDelegate;
             }
 
+            LastMockDelegate = mockDelegate;
             return mockDelegate;
         }
+
+        public MockDelegate LastMockDelegate { get; private set; }
 
         static FieldInfo getMockField(Type targetType, MethodInfo method)
         {

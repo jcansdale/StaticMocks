@@ -191,28 +191,27 @@ namespace ParallelTests
 The `[Collection(...)]` attributes are only necessary when a target class is being mocked by multiple xUnit test fixtures.
 By default NUnit doesn't do parallel testing of fixtures, so this shouldn't be an issue unless you explicitly enable it.
 
-#### How do I mock defaults?
+#### How do I specify default values or exceptions?
 
-This is easy for methods that return a simple value. You can mock the default return value before the specific. For example:
+For methods that return a simple value, you can specify the default `Returns` value before the specific values. For example:
 
 ```c#
 staticMock.For(() => File.Exists(null)).ReturnsForAnyArgs(false);
 staticMock.For(() => File.Exists("foo.txt")).Returns(true);
 ```
 
-At the moment it is a little more tricky if want to throw an exception in the default case. You will need to do something like this:
+Alternatively, you can call `ReturnsForAll` *after* specifying your `Returns`.
 
 ```c#
-staticMock.For(() => File.ReadAllText(null)).ReturnsForAnyArgs(x =>
-{
-    switch(x.ArgAt<string>(0))
-    {
-        case "foo.txt":
-            return "bar";
-        default:
-            throw new FileNotFoundException();
-    }
-});
+staticMock.For(() => File.Exists("foo.txt")).Returns(true);
+staticMock.ReturnsForAll(false);
+```
+
+If you need to throw an exception in the default case, you can call `ThrowsForAll` *after* specifying your `Returns`.
+
+```c#
+staticMock.For(() => File.ReadAllText("foo.txt")).Returns("bar");
+staticMock.ThrowsForAll(new FileNotFoundException());
 ```
 
 #### Conclusion

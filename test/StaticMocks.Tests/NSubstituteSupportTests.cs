@@ -246,6 +246,61 @@
         }
 
         [Test]
+        public void ReturnsForAll_Default_ExpectDefault()
+        {
+            var specifiedText = "__NORMAL__";
+            var defaultText = "__DEFAULT__";
+            staticMock.For(() => Tests.StaticClass.FuncMethod(0)).Returns(specifiedText);
+            staticMock.ReturnsForAll(defaultText);
+
+            var text = StaticClass.FuncMethod1(1);
+
+            Assert.That(text, Is.EqualTo(defaultText));
+        }
+
+        [Test]
+        public void ReturnsForAll_Default_ExpectNormal()
+        {
+            var specifiedText = "__NORMAL__";
+            var defaultText = "__DEFAULT__";
+            staticMock.For(() => Tests.StaticClass.FuncMethod(0)).Returns(specifiedText);
+            staticMock.ReturnsForAll(defaultText);
+
+            var text = StaticClass.FuncMethod1(0);
+
+            Assert.That(text, Is.EqualTo(specifiedText));
+        }
+
+        [Test]
+        public void ReturnsForAll_ForNotCalledBeforeFunc_ReturnsForAllMessage()
+        {
+            var ex = Assert.Throws<StaticMockException>(() => staticMock.ReturnsForAll(_ => ""));
+
+            Assert.That(ex.Message, Is.EqualTo(StaticMockException.ReturnsForAllMessage()));
+        }
+
+        [Test]
+        public void ReturnsForAll_ForNotCalledBeforeValue_ReturnsForAllMessage()
+        {
+            var ex = Assert.Throws<StaticMockException>(() => staticMock.ReturnsForAll(""));
+
+            Assert.That(ex.Message, Is.EqualTo(StaticMockException.ReturnsForAllMessage()));
+        }
+
+        [Test]
+        public void ThrowsForAll_Default_ExpectException()
+        {
+            var specifiedText = "__NORMAL__";
+            var exceptionMessage = "Boom!";
+            staticMock.For(() => Tests.StaticClass.FuncMethod(0)).Returns(specifiedText);
+            staticMock.ThrowsForAll(new Exception(exceptionMessage));
+
+            var ex = Assert.Throws<Exception>(() => StaticClass.FuncMethod1(1));
+
+            Assert.That(ex.Message, Is.EqualTo(exceptionMessage));
+        }
+
+        [Test]
         public void For_Func1_ExpectReturns()
         {
             var expectText = "__ExpectText1__";

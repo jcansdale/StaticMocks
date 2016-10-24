@@ -36,13 +36,26 @@ public class TargetClassTests
     }
 
     [Test]
+    public void MockStaticDefaultThrowsForAll()
+    {
+        using (var staticMock = new StaticMock(typeof(ClassUsesFile)))
+        {
+            staticMock.For(() => File.ReadAllText("foo.txt")).Returns("bar");
+            staticMock.ThrowsForAll(new FileNotFoundException());
+
+            Assert.That(ClassUsesFile.ShoutFile("foo.txt"), Is.EqualTo("BAR"));
+            Assert.Throws<FileNotFoundException>(() => ClassUsesFile.ShoutFile("boom.txt"));
+        }
+    }
+
+    [Test]
     public void MockStaticDefaultThrows()
     {
         using (var staticMock = new StaticMock(typeof(ClassUsesFile)))
         {
             staticMock.For(() => File.ReadAllText(null)).ReturnsForAnyArgs(x =>
             {
-                switch(x.ArgAt<string>(0))
+                switch (x.ArgAt<string>(0))
                 {
                     case "foo.txt":
                         return "bar";
@@ -55,7 +68,6 @@ public class TargetClassTests
             Assert.Throws<FileNotFoundException>(() => ClassUsesFile.ShoutFile("boom.txt"));
         }
     }
-
 }
 
 public class ClassUsesFile

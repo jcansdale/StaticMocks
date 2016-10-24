@@ -27,5 +27,10 @@ Please add the following as a nested class to '{0}':
 
 {1}", targetType.FullName, classDefinition);
         }
+
+        public static string ReturnsForAllMessage()
+        {
+            return "StaticMock.For must be called before ReturnsForAll.";
+        }
     }
 }
