@@ -1,5 +1,5 @@
 ﻿{
-  "version": "0.8.0-beta-*",
+  "version": "0.8.0-RC-*",
   "runtimes": { "win": {} },
 
   "dependencies": {
